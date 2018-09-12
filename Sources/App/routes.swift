@@ -6,10 +6,25 @@ public func routes(_ router: Router) throws {
     router.get("hello") { req in
         return "Hello, world!"
     }
+    
+    struct JSONExapmple: Content {
+        let name: String
+        let age: Int
+        let birthday: Date
+    }
+    
+    router.get("json") { req -> JSONExapmple in
+        return JSONExapmple.init(name: "Hello", age: 18, birthday: .init())
+    }
 
     // Example of configuring a controller
     let todoController = TodoController()
-    router.get("todos", use: todoController.index)
-    router.post("todos", use: todoController.create)
-    router.delete("todos", Todo.parameter, use: todoController.delete)
+    let todos = router.grouped("todos")
+    let todo = todos.grouped(Todo.parameter)
+    todos.get(use: todoController.index)
+    todo.get( use: todoController.view)
+    todos.post(use: todoController.create)
+    todo.patch(use: todoController.update)
+    todo.delete(use: todoController.delete)
+    todos.delete(use: todoController.clear)
 }
